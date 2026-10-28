@@ -1,0 +1,113 @@
+name: PatchProof validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pip check
+      - run: python -m compileall -q apps/api packages benchmarks tests scripts
+      - run: python -m pytest -q -rs
+      - run: python -m ruff check packages apps/api benchmarks scripts tests
+      - run: python -m ruff format --check packages apps/api benchmarks scripts tests
+      - run: python -m mypy packages apps/api --ignore-missing-imports
+      - run: python -c "import z3; from packages.intelligence import _js_analysis; assert _js_analysis('function f(){return 1}', 'javascript')[2]"
+      - run: python -m benchmarks.evaluate --output /tmp/patchproof-synthetic-results
+      - run: python -m pip_audit --progress-spinner off
+      - run: python -m scripts.security_scan
+
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16.5-alpine
+        env:
+          POSTGRES_USER: patchproof
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: patchproof_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U patchproof -d patchproof_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      # Never point an integration test at the app or production database.
+      PATCHPROOF_TEST_DATABASE_URL: postgresql+psycopg://patchproof:ci-only-password@127.0.0.1:5432/patchproof_test
+      PATCHPROOF_DATABASE_URL: postgresql+psycopg://patchproof:ci-only-password@127.0.0.1:5432/patchproof_test
+      PATCHPROOF_REQUIRE_POSTGRES: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - name: Apply real PostgreSQL schema migrations
+        run: python -m alembic upgrade head
+      - name: Test PostgreSQL persistence and atomic claims (must not skip)
+        run: python -m pytest -q tests/test_postgres_integration.py tests/test_postgres_concurrency.py -rs
+      - name: Check migration at HEAD
+        run: python -m alembic current
+
+  sandbox:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[dev]'
+      - name: Verify Docker daemon exists
+        run: docker info
+      - name: Pull sandbox image in advance
+        run: docker pull python:3.12-alpine && docker pull node:22-alpine
+      - name: Build trusted offline pytest sandbox image
+        run: docker build -f docker/pytest-runner.Dockerfile -t patchproof-pytest:3.12-9.0.2 .
+      - name: Run actual Docker sandbox integration cases
+        run: python -m pytest -q tests/test_docker_integration.py -rs
+      - name: Run controlled Docker smoke scenarios
+        run: python -m scripts.sandbox_smoke
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+        working-directory: .
+      - name: Enforce committed npm lockfile
+        run: |
+          if [ ! -s package-lock.json ]; then
+            echo "ERROR: missing committed package-lock.json; run npm install --package-lock-only."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test
+      - run: npx playwright install chromium --with-deps
+      - run: npm run e2e

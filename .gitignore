@@ -1,0 +1,27 @@
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+.env
+*.pyc
+*.db
+*.sqlite
+*.sqlite3
+.patchproof-data/
+apps/web/dist/
+apps/web/test-results/
+apps/web/playwright-report/
+coverage/
+.pyright/
+.mypy_cache/
+.ruff_cache/
+
+.verification-logs/
+
+.patchproof-e2e-data/
+
+.runtime/
+.verification-logs/
+
+# TypeScript incremental compilation artifacts
+*.tsbuildinfo

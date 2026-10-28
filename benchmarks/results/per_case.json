@@ -1,0 +1,200 @@
+[
+  {
+    "case_id": "case-01",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 1,
+    "recall_at_1": 1,
+    "recall_at_5": 1,
+    "reciprocal_rank": 1.0,
+    "latency_ms": 0.733,
+    "candidate_order": [
+      "finance/interest.py",
+      "finance/taxes.py",
+      "web/views.py"
+    ]
+  },
+  {
+    "case_id": "case-01",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-01",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-01",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-02",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 1,
+    "recall_at_1": 1,
+    "recall_at_5": 1,
+    "reciprocal_rank": 1.0,
+    "latency_ms": 0.231,
+    "candidate_order": [
+      "users/normalization.py",
+      "jobs/queue.py",
+      "users/session.py"
+    ]
+  },
+  {
+    "case_id": "case-02",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-02",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-02",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-03",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 2,
+    "recall_at_1": 0,
+    "recall_at_5": 1,
+    "reciprocal_rank": 0.5,
+    "latency_ms": 0.274,
+    "candidate_order": [
+      "pagination/offset.py",
+      "pagination/page.py",
+      "audit/report.py"
+    ]
+  },
+  {
+    "case_id": "case-03",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-03",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-03",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-04",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 1,
+    "recall_at_1": 1,
+    "recall_at_5": 1,
+    "reciprocal_rank": 1.0,
+    "latency_ms": 0.238,
+    "candidate_order": [
+      "formatting/money.py",
+      "formatting/date.py",
+      "storage/cache.py"
+    ]
+  },
+  {
+    "case_id": "case-04",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-04",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-04",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-05",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 1,
+    "recall_at_1": 1,
+    "recall_at_5": 1,
+    "reciprocal_rank": 1.0,
+    "latency_ms": 0.219,
+    "candidate_order": [
+      "stats/average.py",
+      "stats/median.py",
+      "ui/theme.py"
+    ]
+  },
+  {
+    "case_id": "case-05",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-05",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-05",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-06",
+    "strategy": "lexical",
+    "status": "measured",
+    "rank": 1,
+    "recall_at_1": 1,
+    "recall_at_5": 1,
+    "reciprocal_rank": 1.0,
+    "latency_ms": 0.228,
+    "candidate_order": [
+      "auth/tokens.py",
+      "api/response.py",
+      "auth/passwords.py"
+    ]
+  },
+  {
+    "case_id": "case-06",
+    "strategy": "semantic",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-06",
+    "strategy": "hybrid_no_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  },
+  {
+    "case_id": "case-06",
+    "strategy": "hybrid_graph",
+    "status": "unavailable",
+    "reason": "ConnectError: [Errno 111] Connection refused"
+  }
+]

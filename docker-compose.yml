@@ -1,0 +1,77 @@
+# Single-tenant deployment; the public API never has a Docker socket.
+# The trusted worker runs separately on the host; see docs/TRUSTED_WORKER.md.
+services:
+  db:
+    image: postgres:16.5-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: patchproof
+      POSTGRES_PASSWORD: ${PATCHPROOF_DB_PASSWORD:?Set PATCHPROOF_DB_PASSWORD}
+      POSTGRES_DB: patchproof
+    ports: ['127.0.0.1:5432:5432']
+    volumes: [patchproof_pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U patchproof -d patchproof"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db: {condition: service_healthy}
+    environment:
+      PATCHPROOF_DATABASE_URL: postgresql+psycopg://patchproof:${PATCHPROOF_DB_PASSWORD}@db:5432/patchproof
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+
+  prepare-data:
+    # Trusted one-shot storage bootstrap: no untrusted repository code enters
+    # this container. Only the API and host worker use the resulting directory.
+    image: alpine:3.20
+    user: '0:0'
+    command:
+      - sh
+      - -ec
+      - 'chown -R ${PATCHPROOF_HOST_UID:-10001}:${PATCHPROOF_HOST_GID:-10001} /var/lib/patchproof && chmod 0700 /var/lib/patchproof'
+    volumes:
+      - ./.runtime/data:/var/lib/patchproof
+    restart: 'no'
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      prepare-data: {condition: service_completed_successfully}
+    environment:
+      PATCHPROOF_DATABASE_URL: postgresql+psycopg://patchproof:${PATCHPROOF_DB_PASSWORD}@db:5432/patchproof
+      PATCHPROOF_API_KEY: ${PATCHPROOF_API_KEY:?Set PATCHPROOF_API_KEY}
+      PATCHPROOF_DATA: /var/lib/patchproof
+      PATCHPROOF_OLLAMA_URL: http://host.docker.internal:11434
+    extra_hosts: ['host.docker.internal:host-gateway']
+    ports: ['127.0.0.1:8000:8000']
+    volumes:
+      # Shared with a separate host worker. Create .runtime/data as an
+      # operator-owned directory and ensure UID/GID below has write access.
+      - ./.runtime/data:/var/lib/patchproof
+    user: '${PATCHPROOF_HOST_UID:-10001}:${PATCHPROOF_HOST_GID:-10001}'
+    security_opt: ['no-new-privileges:true']
+    cap_drop: ['ALL']
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=64m']
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request;urllib.request.urlopen("http://127.0.0.1:8000/health",timeout=3)']
+      interval: 15s
+      timeout: 5s
+      retries: 8
+volumes:
+  patchproof_pgdata:

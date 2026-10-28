@@ -1,0 +1,22 @@
+# Build context must not contain host secrets, imported sources, or credentials.
+.git
+.env
+.env.*
+!.env.example
+.runtime/
+.patchproof-data/
+.verification-logs/
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.sqlite*
+*.tsbuildinfo
+node_modules/
+apps/web/dist/
+apps/web/test-results/
+apps/web/playwright-report/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+benchmarks/results/

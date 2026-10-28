@@ -1,0 +1,39 @@
+{
+  "benchmark": "small synthetic fault-localization fixtures; not a public real-world defect benchmark",
+  "cases": 6,
+  "methods": {
+    "lexical": {
+      "status": "measured",
+      "cases": 6,
+      "recall_at_1": 0.8333333333333334,
+      "recall_at_5": 1.0,
+      "mrr": 0.9166666666666666,
+      "median_latency_ms": 0.2345,
+      "p95_latency_ms": 0.733
+    },
+    "semantic": {
+      "status": "incomplete",
+      "measured_cases": 0,
+      "total_cases": 6,
+      "reason": "Some evaluations require a real configured embedding model. No score is reported for incomplete strategies."
+    },
+    "hybrid_no_graph": {
+      "status": "incomplete",
+      "measured_cases": 0,
+      "total_cases": 6,
+      "reason": "Some evaluations require a real configured embedding model. No score is reported for incomplete strategies."
+    },
+    "hybrid_graph": {
+      "status": "incomplete",
+      "measured_cases": 0,
+      "total_cases": 6,
+      "reason": "Some evaluations require a real configured embedding model. No score is reported for incomplete strategies."
+    }
+  },
+  "peak_tracemalloc_bytes": 3976227,
+  "limitations": [
+    "No real-world patches or model quality claims.",
+    "A neural embedding model must be configured for semantic and hybrid methods.",
+    "Tracemalloc tracks Python memory, not full process RSS."
+  ]
+}
